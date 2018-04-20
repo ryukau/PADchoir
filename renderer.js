@@ -85,24 +85,8 @@ function padsynth(sampleRate, frequencies, bandWidth, rnd) {
   return normalize(sound)
 }
 
-// params = {
-//   length,
-//   sampleRate,
-//   envGain,
-//   numBin,
-//   minFreq,
-//   maxFreq,
-//   minGain,
-//   maxGain,
-//   bandWidth
-//   seedFreq,
-//   seedGain,
-//   seedPhase,
-// }
-
 onmessage = (event) => {
   var params = event.data
-  // console.log(params)
 
   var rndFreq = new MersenneTwister(params.seedFreq)
   var rndGain = new MersenneTwister(params.seedGain)
