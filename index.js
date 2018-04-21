@@ -85,6 +85,7 @@ function makeWave() {
       seedFreq: inputSeedFreq.value + inputSeedFreq.max * ch,
       seedGain: inputSeedGain.value + inputSeedGain.max * ch,
       seedPhase: inputSeedPhase.value + inputSeedPhase.max * ch,
+      padType: pullDownMenuPadType.value,
     })
   }
 
@@ -298,6 +299,10 @@ var inputSeedPhase = new NumberInput(divPadsynthControls.element, "SeedPhase",
   0, 0, Math.floor(Number.MAX_SAFE_INTEGER / 2), 1, refresh)
 var checkboxGainInvert = new Checkbox(divPadsynthControls.element, "GainInvert",
   false, refresh)
+var pullDownMenuPadType = new PullDownMenu(divRenderControls.element, null,
+  () => { refresh() })
+pullDownMenuPadType.add("Choir1")
+pullDownMenuPadType.add("Cymbal")
 
 refresh()
 
