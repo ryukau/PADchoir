@@ -85,25 +85,7 @@ function padsynth(sampleRate, frequencies, bandWidth, rnd) {
   return normalize(sound)
 }
 
-// params = {
-//   length,
-//   sampleRate,
-//   envGain,
-//   numBin,
-//   minFreq,
-//   maxFreq,
-//   minGain,
-//   maxGain,
-//   bandWidth
-//   seedFreq,
-//   seedGain,
-//   seedPhase,
-// }
-
-onmessage = (event) => {
-  var params = event.data
-  // console.log(params)
-
+function makeCymbalFrequencies(params) {
   var rndFreq = new MersenneTwister(params.seedFreq)
   var rndGain = new MersenneTwister(params.seedGain)
 
@@ -116,11 +98,45 @@ onmessage = (event) => {
       gain: params.minGain + rndGain.random() * diffGain,
     })
   }
+  return frequencies
+}
+
+function makeChoir1Frequencies(params) {
+  var frequencies = []
+
+  var base = 220
+  frequencies.push({ freq: base, gain: 0.2 + 0.3 })
+  frequencies.push({ freq: base * 2, gain: 1.0 })
+  frequencies.push({ freq: base * 3, gain: 0.5 })
+  frequencies.push({ freq: base * 4, gain: 1.0 })
+
+  frequencies.push({ freq: base * 8, gain: 0.1 })
+  frequencies.push({ freq: base * 9, gain: 0.1 })
+
+  frequencies.push({ freq: base * 20, gain: 0.05 })
+  frequencies.push({ freq: base * 21, gain: 0.05 })
+  frequencies.push({ freq: base * 22, gain: 0.05 })
+  frequencies.push({ freq: base * 23, gain: 0.05 })
+  frequencies.push({ freq: base * 24, gain: 0.05 })
+
+  return frequencies
+}
+
+onmessage = (event) => {
+  var params = event.data
+
+  var frequencies
+  if (params.padType === "Choir1") {
+    frequencies = makeChoir1Frequencies(params)
+  }
+  else {
+    frequencies = makeCymbalFrequencies(params)
+  }
 
   var sound = padsynth(
     params.sampleRate,
     frequencies,
-    params.bandWidth,
+    params.bandWidth * 4,
     new MersenneTwister(params.seedPhase)
   )
   var envGain = new Envelope(
