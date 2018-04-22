@@ -115,35 +115,23 @@ function makeAdditiveChoirFrequencies(params, rnd) {
   return frequencies
 }
 
-function randomRange(rnd, min, max) {
-  return (max - min) * rnd.random() + min
-}
-
-function randomRangeInt(rnd, min, max) {
-  return Math.floor(randomRange(rnd, min, max + 1))
-}
-
 function makeFrequencyShiftChoirFrequencies(params, rnd) {
-  var spec = renderFixedParams(
+  var spec = render(
     params.baseFreq,
-    9,
-    randomRange(rnd, -40, 40),
-    2,
-    36, // 固定
-    68, // 固定
-    89, // 固定
-    13, // 1, 5, 6, 9, 10, 11, 12, 13
-    randomRange(rnd, 100, 120),
-    randomRange(rnd, 16, 20),
-    randomRangeInt(rnd, 7, 15),
-    true,
-    randomRange(rnd, 90, 130),
-    randomRange(rnd, 50, 100)//78
+    params.basefunc,
+    params.basefuncP1,
+    params.modType,
+    params.modP1,
+    params.modP2,
+    params.modP3,
+    params.filtType,
+    params.filtCutoff,
+    params.filtQ,
+    params.harmonicShift,
+    params.adaptiveHarmonics,
+    params.adaptBaseFreq,
+    params.adaptPower
   )
-  // 1088100040033519
-
-  // 0.00016027502715587616
-  // -0.10834067585528828
 
   var frequencies = []
   for (var i = 1; i < spec.real.length; ++i) {

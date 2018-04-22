@@ -1,4 +1,16 @@
-// Yoshimi の Synth/OscilGen.cpp から移植。
+/*
+    OscilGen.cpp - Waveform generator for ADnote
+
+    Original ZynAddSubFX author Nasca Octavian Paul
+    Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009-2011 Alan Calvert
+    Copyright 2009 James Morris
+    Copyright 2016-2018 Will Godfrey & others
+
+    This file is translated from OscilGen.cpp of yoshimi, which is under GPL
+    version 2 or any later version.
+*/
+
 // lib/fft.jsに依存。
 
 const TWOPI = 2 * Math.PI

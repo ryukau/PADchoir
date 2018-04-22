@@ -78,6 +78,19 @@ function makeWave() {
       bandWidth: inputBandWidth.value,
       seed: inputSeed.value + inputSeed.max * ch,
       padType: pullDownMenuPadType.value,
+      basefunc: inputBaseFunction.value,
+      basefuncP1: inputBaseFunctionP1.value,
+      modType: inputModType.value,
+      modP1: inputModP1.value,
+      modP2: inputModP2.value,
+      modP3: inputModP3.value,
+      filtType: inputFiltType.value,
+      filtCutoff: inputFiltCutoff.value,
+      filtQ: inputFiltQ.value,
+      harmonicShift: inputHarmonicShift.value,
+      adaptiveHarmonics: checkboxAdaptHarmo.value,
+      adaptBaseFreq: inputAdaptBaseFreq.value,
+      adaptPower: inputAdaptPower.value,
     })
   }
 
@@ -124,8 +137,45 @@ function randomRange(min, max) {
   return (max - min) * Math.random() + min
 }
 
+function randomRangeInt(min, max) {
+  return Math.floor(randomRange(min, max + 1))
+}
+
 function random() {
-  if (pullDownMenuRandomType.value === "Seed") {
+  // var spec = renderFixedParams(
+  //   params.baseFreq,
+  //   9,
+  //   randomRange(rnd, -40, 40),
+  //   2,
+  //   36, // 固定
+  //   68, // 固定
+  //   89, // 固定
+  //   13, // 1, 5, 6, 9, 10, 11, 12, 13
+  //   randomRange(rnd, 100, 120),
+  //   randomRange(rnd, 16, 20),
+  //   randomRangeInt(rnd, 7, 15),
+  //   true,
+  //   randomRange(rnd, 90, 130),
+  //   randomRange(rnd, 50, 100)//78
+  // )
+  if (pullDownMenuRandomType.value === "Choir") {
+    var filtTypes = [1, 5, 6, 9, 10, 11, 12, 13]
+
+    // inputBaseFunction.value = 9
+    inputBaseFunctionP1.value = randomRange(-0.32, 0.32)
+    inputModType.value = 2
+    inputModP1.value = 0.28346456692913385
+    inputModP2.value = 0.5354330708661418
+    inputModP3.value = 0.7007874015748031
+    inputFiltType.value = filtTypes[Math.floor(Math.random() * filtTypes.length)]
+    inputFiltCutoff.value = randomRange(0.78125, 1)
+    inputFiltQ.value = randomRange(0.12, 0.16)
+    inputHarmonicShift.value = randomRangeInt(7, 15)
+    checkboxAdaptHarmo.value = true
+    inputAdaptBaseFreq.value = randomRange(0.7, 1.2)
+    inputAdaptPower.value = randomRange(0.3, 1)
+  }
+  else if (pullDownMenuRandomType.value === "Seed") {
     inputSeed.random()
   }
   else {
@@ -176,6 +226,7 @@ var buttonRandom = new Button(divRenderControls.element, "Random",
   () => random())
 var pullDownMenuRandomType = new PullDownMenu(divRenderControls.element, null,
   () => { })
+pullDownMenuRandomType.add("Choir")
 pullDownMenuRandomType.add("Seed")
 pullDownMenuRandomType.add("All")
 var buttonSave = new Button(divRenderControls.element, "Save",
@@ -206,6 +257,35 @@ var pullDownMenuPadType = new PullDownMenu(divPadsynthControls.element, null,
   () => { refresh() })
 pullDownMenuPadType.add("FrequencyShiftChoir")
 pullDownMenuPadType.add("AdditiveChoir")
+
+var divWaveTableControls = new Div(divControlLeft.element, "WaveTableControls")
+var headingWaveTable = new Heading(divWaveTableControls.element, 6, "Wave Table")
+var inputBaseFunction = new NumberInput(divWaveTableControls.element, "BaseFunc",
+  9, 0, 15, 1, refresh)
+var inputBaseFunctionP1 = new NumberInput(divWaveTableControls.element, "BaseFuncP1",
+  0.4, 0, 1.0, 0.0001, refresh)
+var inputModType = new NumberInput(divWaveTableControls.element, "Mod.Type",
+  1, 0, 3, 1, refresh)
+var inputModP1 = new NumberInput(divWaveTableControls.element, "Mod.P1",
+  36 / 127, 0, 1.0, 0.0001, refresh)
+var inputModP2 = new NumberInput(divWaveTableControls.element, "Mod.P2",
+  68 / 127, 0, 1.0, 0.0001, refresh)
+var inputModP3 = new NumberInput(divWaveTableControls.element, "Mod.P3",
+  89 / 127, 0, 1.0, 0.0001, refresh)
+var inputFiltType = new NumberInput(divWaveTableControls.element, "Filt.Type",
+  1, 0, 13, 1, refresh)
+var inputFiltCutoff = new NumberInput(divWaveTableControls.element, "Filt.Cutoff",
+  102 / 128, 0, 1.0, 0.0001, refresh)
+var inputFiltQ = new NumberInput(divWaveTableControls.element, "Filt.Q",
+  16 / 127, 0, 1.0, 0.0001, refresh)
+var inputHarmonicShift = new NumberInput(divWaveTableControls.element, "Harmo.Shift",
+  7, -128, 128, 1, refresh)
+var checkboxAdaptHarmo = new Checkbox(divWaveTableControls.element, "Adapt.Harmo",
+  true, refresh)
+var inputAdaptBaseFreq = new NumberInput(divWaveTableControls.element, "Adapt.Freq",
+  124 / 128, 0, 1.0, 0.0001, refresh)
+var inputAdaptPower = new NumberInput(divWaveTableControls.element, "Adapt.Power",
+  78 / 127, 0, 1.0, 0.0001, refresh)
 
 refresh()
 
