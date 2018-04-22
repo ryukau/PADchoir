@@ -2,7 +2,8 @@ importScripts(
   "lib/bezier-easing.js",
   "lib/fft.js",
   "lib/mersenne-twister.js",
-  "envelope.js"
+  "envelope.js",
+  "oscilgen.js"
 )
 
 function profile(fi, bwi) {
@@ -85,72 +86,95 @@ function padsynth(sampleRate, frequencies, bandWidth, rnd) {
   return normalize(sound)
 }
 
-function makeCymbalFrequencies(params) {
-  var rndFreq = new MersenneTwister(params.seedFreq)
-  var rndGain = new MersenneTwister(params.seedGain)
-
+function makeAdditiveChoirFrequencies(params, rnd) {
   var frequencies = []
-  var diffFreq = params.maxFreq - params.minFreq
-  var diffGain = params.maxGain - params.minGain
-  for (var i = 0; i < params.numBin; ++i) {
-    frequencies.push({
-      freq: params.minFreq + rndFreq.random() * diffFreq,
-      gain: params.minGain + rndGain.random() * diffGain,
-    })
-  }
-  return frequencies
-}
+  var base = 55
 
-function makeChoir1Frequencies(params) {
-  var frequencies = []
+  // 2^n
+  // 2^n + 2^(n-1), n > 0
 
-  var base = 220
-  frequencies.push({ freq: base, gain: 0.2 + 0.3 })
+  frequencies.push({ freq: base, gain: 0.0005 }) // 0.5-0.0001
   frequencies.push({ freq: base * 2, gain: 1.0 })
   frequencies.push({ freq: base * 3, gain: 0.5 })
   frequencies.push({ freq: base * 4, gain: 1.0 })
+  frequencies.push({ freq: base * 6, gain: 0.5 })
 
-  frequencies.push({ freq: base * 8, gain: 0.1 })
+  frequencies.push({ freq: base * 8, gain: 0.001 })
   frequencies.push({ freq: base * 9, gain: 0.1 })
+  // frequencies.push({ freq: base * 10, gain: 0.004 }) // ホーミー。
 
+  frequencies.push({ freq: base * 12, gain: 0.1 })
+
+  // frequencies.push({ freq: base * 19, gain: 0.05 })
   frequencies.push({ freq: base * 20, gain: 0.05 })
   frequencies.push({ freq: base * 21, gain: 0.05 })
-  frequencies.push({ freq: base * 22, gain: 0.05 })
-  frequencies.push({ freq: base * 23, gain: 0.05 })
+  frequencies.push({ freq: base * 22, gain: 0.02 })
+  // frequencies.push({ freq: base * 23, gain: 0.05 })
   frequencies.push({ freq: base * 24, gain: 0.05 })
 
   return frequencies
 }
 
+function randomRange(rnd, min, max) {
+  return (max - min) * rnd.random() + min
+}
+
+function randomRangeInt(rnd, min, max) {
+  return Math.floor(randomRange(rnd, min, max + 1))
+}
+
+function makeFrequencyShiftChoirFrequencies(params, rnd) {
+  var spec = renderFixedParams(
+    params.baseFreq,
+    9,
+    randomRange(rnd, -40, 40),
+    2,
+    36, // 固定
+    68, // 固定
+    89, // 固定
+    13, // 1, 5, 6, 9, 10, 11, 12, 13
+    randomRange(rnd, 100, 120),
+    randomRange(rnd, 16, 20),
+    randomRangeInt(rnd, 7, 15),
+    true,
+    randomRange(rnd, 90, 130),
+    randomRange(rnd, 50, 100)//78
+  )
+  // 1088100040033519
+
+  // 0.00016027502715587616
+  // -0.10834067585528828
+
+  var frequencies = []
+  for (var i = 1; i < spec.real.length; ++i) {
+    var frq = params.baseFreq * i
+    if (frq > params.sampleRate / 2) break
+    frequencies.push({
+      freq: frq,
+      gain: Math.sqrt(spec.real[i] * spec.real[i] + spec.imag[i] * spec.imag[i])
+    })
+  }
+  return frequencies
+}
+
 onmessage = (event) => {
   var params = event.data
+  var rnd = new MersenneTwister(params.seed)
 
   var frequencies
-  if (params.padType === "Choir1") {
-    frequencies = makeChoir1Frequencies(params)
+  if (params.padType === "FrequencyShiftChoir") {
+    frequencies = makeFrequencyShiftChoirFrequencies(params, rnd)
   }
   else {
-    frequencies = makeCymbalFrequencies(params)
+    frequencies = makeAdditiveChoirFrequencies(params, rnd)
   }
 
   var sound = padsynth(
     params.sampleRate,
     frequencies,
-    params.bandWidth * 4,
-    new MersenneTwister(params.seedPhase)
+    params.bandWidth,
+    rnd
   )
-  var envGain = new Envelope(
-    params.envGain.x1,
-    params.envGain.y1,
-    params.envGain.x2,
-    params.envGain.y2
-  )
-  var waveLength = Math.floor(params.sampleRate * params.length)
-  var wave = new Array(waveLength).fill(0)
-  for (var i = 0; i < wave.length; ++i) {
-    wave[i] = Math.pow(envGain.decay(i / wave.length), params.envPower)
-      * sound[i % sound.length]
-  }
 
-  postMessage(wave)
+  postMessage(sound)
 }
