@@ -303,7 +303,7 @@ var inputFiltCutoff = new NumberInput(divWaveTableControls.element, "Filt.Cutoff
 var inputFiltQ = new NumberInput(divWaveTableControls.element, "Filt.Q",
   16 / 127, 0, 1.0, 0.0001, refresh)
 var inputHarmonicShift = new NumberInput(divWaveTableControls.element, "Harmo.Shift",
-  7, -128, 128, 1, refresh)
+  7, -64, 64, 1, refresh)
 var checkboxAdaptHarmo = new Checkbox(divWaveTableControls.element, "Adapt.Harmo",
   true, refresh)
 var inputAdaptBaseFreq = new NumberInput(divWaveTableControls.element, "Adapt.Freq",
