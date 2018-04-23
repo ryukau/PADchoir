@@ -20,7 +20,12 @@ class RenderParameters {
   }
 }
 
-function play(audioContext, wave) {
+function play(audioContext, wave, stop = false) {
+  if (stop) {
+    this.source.stop()
+    return
+  }
+
   var channel = wave.channels
   var frame = wave.frames
   var buffer = audioContext.createBuffer(channel, frame, audioContext.sampleRate)
@@ -84,23 +89,21 @@ function makeWave() {
       workers[ch].isRunning = true
     }
     workers[ch].worker.postMessage({
-      length: inputLength.value,
       sampleRate: audioContext.sampleRate,
       baseFreq: inputBaseFreq.value,
       bandWidth: inputBandWidth.value,
       seed: inputSeed.value + inputSeed.max * ch,
-      padType: pullDownMenuPadType.value,
-      basefunc: inputBaseFunction.value,
+      basefunc: pullDownMenuBaseFunction.index,
       basefuncP1: inputBaseFunctionP1.value,
-      modType: inputModType.value,
+      modType: pullDownMenuModType.index,
       modP1: inputModP1.value,
       modP2: inputModP2.value,
       modP3: inputModP3.value,
-      filtType: inputFiltType.value,
+      filtType: pullDownMenuFiltType.index,
       filtCutoff: inputFiltCutoff.value,
       filtQ: inputFiltQ.value,
       harmonicShift: inputHarmonicShift.value,
-      adaptiveHarmonics: checkboxAdaptHarmo.value,
+      adaptiveHarmonics: pullDownMenuAdaptHarmo.index === 1,
       adaptBaseFreq: inputAdaptBaseFreq.value,
       adaptPower: inputAdaptPower.value,
     })
@@ -127,7 +130,7 @@ function finalize() {
   if (checkboxNormalize.value) {
     wave.normalize()
   }
-  wave.zeroOut(Math.floor(0.002 * audioContext.sampleRate))
+  // wave.zeroOut(Math.floor(0.002 * audioContext.sampleRate))
   waveView.set(wave)
 
   if (checkboxQuickSave.value) {
@@ -165,38 +168,21 @@ function randomRangeInt(min, max) {
 }
 
 function random() {
-  // var spec = renderFixedParams(
-  //   params.baseFreq,
-  //   9,
-  //   randomRange(rnd, -40, 40),
-  //   2,
-  //   36, // 固定
-  //   68, // 固定
-  //   89, // 固定
-  //   13, // 1, 5, 6, 9, 10, 11, 12, 13
-  //   randomRange(rnd, 100, 120),
-  //   randomRange(rnd, 16, 20),
-  //   randomRangeInt(rnd, 7, 15),
-  //   true,
-  //   randomRange(rnd, 90, 130),
-  //   randomRange(rnd, 50, 100)//78
-  // )
   if (pullDownMenuRandomType.value === "Choir") {
-    var filtTypes = [1, 5, 6, 9, 10, 11, 12, 13]
-
-    // inputBaseFunction.value = 9
-    inputBaseFunctionP1.value = randomRange(-0.32, 0.32)
-    inputModType.value = 2
+    inputBaseFunctionP1.value = randomRange(0.18, 0.82)
     inputModP1.value = 0.28346456692913385
     inputModP2.value = 0.5354330708661418
     inputModP3.value = 0.7007874015748031
-    inputFiltType.value = filtTypes[Math.floor(Math.random() * filtTypes.length)]
     inputFiltCutoff.value = randomRange(0.78125, 1)
     inputFiltQ.value = randomRange(0.12, 0.16)
     inputHarmonicShift.value = randomRangeInt(7, 15)
-    checkboxAdaptHarmo.value = true
     inputAdaptBaseFreq.value = randomRange(0.7, 1.2)
     inputAdaptPower.value = randomRange(0.3, 1)
+  }
+  else if (pullDownMenuRandomType.value === "PADsynth") {
+    inputBaseFreq.random()
+    inputBandWidth.random()
+    inputSeed.random()
   }
   else if (pullDownMenuRandomType.value === "Seed") {
     inputSeed.random()
@@ -206,6 +192,20 @@ function random() {
     inputBaseFreq.random()
     inputBandWidth.random()
     inputSeed.random()
+
+    pullDownMenuBaseFunction.random()
+    inputBaseFunctionP1.random()
+    pullDownMenuModType.random()
+    inputModP1.random()
+    inputModP2.random()
+    inputModP3.random()
+    pullDownMenuFiltType.random()
+    inputFiltCutoff.random()
+    inputFiltQ.random()
+    inputHarmonicShift.random()
+    pullDownMenuAdaptHarmo.random()
+    inputAdaptBaseFreq.random()
+    inputAdaptPower.random()
   }
   refresh()
 }
@@ -229,7 +229,8 @@ var divMain = new Div(document.body, "main")
 var headingTitle = new Heading(divMain.element, 1, document.title)
 
 var description = new Description(divMain.element)
-description.add("基本操作", "Playボタンかキーボードのスペースキーで音が再生されます。")
+description.add("基本操作", "Playボタンかキーボードのスペースキーで音を再生します。")
+description.add("", "Stopボタンで音を停止できます。")
 description.add("", "値を変更するかRandomボタンを押すと音がレンダリングされます。")
 description.add("", "Randomボタンの隣のプルダウンメニューでランダマイズの種類を選択できます。")
 description.add("", "Saveボタンで気に入った音を保存できます。")
@@ -239,29 +240,32 @@ var divWaveform = new Div(divMain.element, "waveform")
 var headingWaveform = new Heading(divWaveform.element, 6, "Waveform")
 var waveView = new WaveViewMulti(divWaveform.element, wave.channels)
 
-var divControlLeft = new Div(divMain.element, "controlLeft", "controlBlock")
-var divRenderControls = new Div(divControlLeft.element, "renderControls")
+var divRenderControls = new Div(divMain.element, "renderControls")
 var headingRenderStatus = new Heading(divRenderControls.element, 4,
   "Rendering status will be displayed here.")
 var buttonPlay = new Button(divRenderControls.element, "Play",
   () => play(audioContext, wave))
 var buttonRandom = new Button(divRenderControls.element, "Random",
-  () => random())
+  () => { random(); play(audioContext, wave, true) })
 var pullDownMenuRandomType = new PullDownMenu(divRenderControls.element, null,
   () => { })
 pullDownMenuRandomType.add("Choir")
+pullDownMenuRandomType.add("PADsynth")
 pullDownMenuRandomType.add("Seed")
 pullDownMenuRandomType.add("All")
+var buttonStop = new Button(divRenderControls.element, "Stop",
+  () => play(audioContext, wave, true))
 var buttonSave = new Button(divRenderControls.element, "Save",
   () => save(wave))
 var checkboxQuickSave = new Checkbox(divRenderControls.element, "QuickSave",
   false, (checked) => { })
 
+//// ControlLeft
+var divControlLeft = new Div(divMain.element, "controlLeft", "controlBlock")
+
 var divMiscControls = new Div(divControlLeft.element, "MiscControls")
 var headingRender = new Heading(divMiscControls.element, 6, "Render Settings")
-var inputLength = new NumberInput(divMiscControls.element, "Length",
-  0.8, 0.02, 4, 0.01, refresh)
-var pullDownMenuChannel = new PullDownMenu(divMiscControls.element, null,
+var pullDownMenuChannel = new PullDownMenu(divMiscControls.element, "",
   () => { refresh() })
 pullDownMenuChannel.add("Phase")
 pullDownMenuChannel.add("Mono")
@@ -277,35 +281,81 @@ var inputBandWidth = new NumberInput(divPadsynthControls.element, "BandWidth",
   50, 0.01, 200, 0.01, refresh)
 var inputSeed = new NumberInput(divPadsynthControls.element, "Seed",
   0, 0, Math.floor(Number.MAX_SAFE_INTEGER / 2), 1, refresh)
-var pullDownMenuPadType = new PullDownMenu(divPadsynthControls.element, null,
-  () => { refresh() })
-pullDownMenuPadType.add("FrequencyShiftChoir")
-pullDownMenuPadType.add("AdditiveChoir")
 
-var divWaveTableControls = new Div(divControlLeft.element, "WaveTableControls")
+//// ControlRight
+var divControlRight = new Div(divMain.element, "controlLeft", "controlBlock")
+var divWaveTableControls = new Div(divControlRight.element, "WaveTableControls")
 var headingWaveTable = new Heading(divWaveTableControls.element, 6, "Wave Table")
-var inputBaseFunction = new NumberInput(divWaveTableControls.element, "BaseFunc",
-  9, 0, 15, 1, refresh)
+
+var pullDownMenuBaseFunction = new PullDownMenu(
+  divWaveTableControls.element, "BaseFunc", () => { refresh() })
+pullDownMenuBaseFunction.add("Sine")
+pullDownMenuBaseFunction.add("Triangle")
+pullDownMenuBaseFunction.add("Pulse")
+pullDownMenuBaseFunction.add("Saw")
+pullDownMenuBaseFunction.add("Power")
+pullDownMenuBaseFunction.add("Gauss")
+pullDownMenuBaseFunction.add("Diode")
+pullDownMenuBaseFunction.add("Abssine")
+pullDownMenuBaseFunction.add("Pulsesine")
+pullDownMenuBaseFunction.add("Stretchsine")
+pullDownMenuBaseFunction.add("Chirp")
+pullDownMenuBaseFunction.add("Absstretchsine")
+pullDownMenuBaseFunction.add("Chebyshev")
+pullDownMenuBaseFunction.add("Sqr")
+pullDownMenuBaseFunction.add("Spike")
+pullDownMenuBaseFunction.add("Circle")
+pullDownMenuBaseFunction.setValue("Stretchsine", false)
+
 var inputBaseFunctionP1 = new NumberInput(divWaveTableControls.element, "BaseFuncP1",
   0.4, 0, 1.0, 0.0001, refresh)
-var inputModType = new NumberInput(divWaveTableControls.element, "Mod.Type",
-  1, 0, 3, 1, refresh)
+
+var pullDownMenuModType = new PullDownMenu(
+  divWaveTableControls.element, "Mod.Type", () => { refresh() })
+pullDownMenuModType.add("None")
+pullDownMenuModType.add("Rev")
+pullDownMenuModType.add("Sine")
+pullDownMenuModType.add("Power")
+pullDownMenuModType.setValue("Rev", false)
+
 var inputModP1 = new NumberInput(divWaveTableControls.element, "Mod.P1",
   36 / 127, 0, 1.0, 0.0001, refresh)
 var inputModP2 = new NumberInput(divWaveTableControls.element, "Mod.P2",
   68 / 127, 0, 1.0, 0.0001, refresh)
 var inputModP3 = new NumberInput(divWaveTableControls.element, "Mod.P3",
   89 / 127, 0, 1.0, 0.0001, refresh)
-var inputFiltType = new NumberInput(divWaveTableControls.element, "Filt.Type",
-  1, 0, 13, 1, refresh)
+
+var pullDownMenuFiltType = new PullDownMenu(
+  divWaveTableControls.element, "Filt.Type", () => { refresh() })
+pullDownMenuFiltType.add("None")
+pullDownMenuFiltType.add("LowPass1")
+pullDownMenuFiltType.add("HighPass1a")
+pullDownMenuFiltType.add("HighPass1b")
+pullDownMenuFiltType.add("BandPass1")
+pullDownMenuFiltType.add("BandStop1")
+pullDownMenuFiltType.add("LowPass2")
+pullDownMenuFiltType.add("HighPass2")
+pullDownMenuFiltType.add("BandPass2")
+pullDownMenuFiltType.add("BandStop2")
+pullDownMenuFiltType.add("Cos")
+pullDownMenuFiltType.add("Sin")
+pullDownMenuFiltType.add("LowShelf")
+pullDownMenuFiltType.add("Peaking")
+pullDownMenuFiltType.setValue("LowPass1", false)
+
 var inputFiltCutoff = new NumberInput(divWaveTableControls.element, "Filt.Cutoff",
   102 / 128, 0, 1.0, 0.0001, refresh)
 var inputFiltQ = new NumberInput(divWaveTableControls.element, "Filt.Q",
   16 / 127, 0, 1.0, 0.0001, refresh)
 var inputHarmonicShift = new NumberInput(divWaveTableControls.element, "Harmo.Shift",
   7, -64, 64, 1, refresh)
-var checkboxAdaptHarmo = new Checkbox(divWaveTableControls.element, "Adapt.Harmo",
-  true, refresh)
+
+var pullDownMenuAdaptHarmo = new PullDownMenu(
+  divWaveTableControls.element, "Adapt.Harmo", () => { refresh() })
+pullDownMenuAdaptHarmo.add("Off")
+pullDownMenuAdaptHarmo.add("On")
+pullDownMenuAdaptHarmo.setValue("On", false)
+
 var inputAdaptBaseFreq = new NumberInput(divWaveTableControls.element, "Adapt.Freq",
   124 / 128, 0, 1.0, 0.0001, refresh)
 var inputAdaptPower = new NumberInput(divWaveTableControls.element, "Adapt.Power",
