@@ -166,9 +166,12 @@ class Timer {
 }
 
 class Div {
-  constructor(parent, id) {
+  constructor(parent, id, className = "") {
     this.element = document.createElement("div")
     this.element.id = id
+    if (className.length > 0) {
+      this.element.classList.add(className)
+    }
     parent.appendChild(this.element)
   }
 }
@@ -248,6 +251,22 @@ class Checkbox {
 
   get element() {
     return this.label
+  }
+
+  check() {
+    if (!this.value) this.label.click()
+  }
+
+  unCheck() {
+    if (this.value) this.label.click()
+  }
+
+  toggle() {
+    this.label.click()
+  }
+
+  random() {
+    if (Math.random() < 0.5) this.label.click()
   }
 
   onChange(event) {
@@ -394,12 +413,18 @@ class PullDownMenu {
     this.onChangeFunc(this.value)
   }
 
+  random() {
+    var index = Math.floor(Math.random() * this.options.length)
+    this.select.value = this.options[index].value
+  }
+
   add(label) {
     if (typeof label !== 'string' && !(label instanceof String)) {
       console.log("PullDownMenu.add() failed to invalid type.")
     }
     var option = document.createElement('option')
     option.textContent = label
+    option.value = label
     if (this.options.length <= 0) {
       this.value = label
     }
