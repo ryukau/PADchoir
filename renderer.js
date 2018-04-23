@@ -149,13 +149,8 @@ onmessage = (event) => {
   var params = event.data
   var rnd = new MersenneTwister(params.seed)
 
-  var frequencies
-  if (params.padType === "FrequencyShiftChoir") {
-    frequencies = makeFrequencyShiftChoirFrequencies(params, rnd)
-  }
-  else {
-    frequencies = makeAdditiveChoirFrequencies(params, rnd)
-  }
+  var frequencies = makeFrequencyShiftChoirFrequencies(params, rnd)
+  // var frequencies = makeAdditiveChoirFrequencies(params, rnd)
 
   var sound = padsynth(
     params.sampleRate,
