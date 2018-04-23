@@ -236,17 +236,25 @@ class Checkbox {
     this.onChangeFunc = onChangeFunc
     this.value = checked
 
+    this.div = document.createElement("div")
+    this.div.className = "checkbox"
+    parent.appendChild(this.div)
+
+    this.label = document.createElement("label")
+    this.label.className = "checkboxLabel"
+    this.label.addEventListener("change", (event) => this.onChange(event), false)
+    this.label.innerHTML = label
+    this.label.setAttribute("for", label)
+
     this.input = document.createElement("input")
     this.input.type = "checkbox"
+    this.input.id = label
     if (checked) {
       this.input.setAttribute("checked", checked)
     }
 
-    this.label = document.createElement("label")
-    this.label.className = "checkbox"
-    this.label.addEventListener("change", (event) => this.onChange(event), false)
-    this.label.innerHTML = this.input.outerHTML + label
-    parent.appendChild(this.label)
+    this.div.appendChild(this.input)
+    this.div.appendChild(this.label)
   }
 
   get element() {
@@ -409,10 +417,36 @@ class PullDownMenu {
     this.select.addEventListener("change", (event) => this.onChange(event), false)
   }
 
+  setValue(value, triggerOnChange = true) {
+    var backup = this.select.value
+    this.select.value = value
+    if (this.select.selectedIndex < 0) {
+      this.select.value = backup
+      console.warn("PullDownMenu: Invalid value.")
+      return
+    }
+    this.refreshValue(this.select, triggerOnChange)
+  }
+
+  setIndex(index, triggerOnChange = true) {
+    if (index < 0 || index >= this.options.length) {
+      console.warn("PullDownMenu: Index out of range.")
+      return
+    }
+    this.select.value = this.options[index].value
+    this.refreshValue(this.select, triggerOnChange)
+  }
+
   onChange(event) {
-    this.value = event.target.value
-    this.index = event.target.selectedIndex
-    this.onChangeFunc(this.value)
+    this.refreshValue(event.target, true)
+  }
+
+  refreshValue(select, triggerOnChange) {
+    this.value = select.value
+    this.index = select.selectedIndex
+    if (triggerOnChange) {
+      this.onChangeFunc(this.value)
+    }
   }
 
   random() {
