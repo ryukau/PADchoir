@@ -635,6 +635,7 @@ function renderFixedParams(
   adaptBaseFreq,
   adaptPower
 ) {
+  oscP1 += 64
   return render(
     freqhz,
     oscType,
