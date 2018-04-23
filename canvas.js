@@ -391,6 +391,7 @@ class PullDownMenu {
   constructor(parent, label, onChangeFunc) {
     this.onChangeFunc = onChangeFunc
     this.value = null
+    this.index = null
     this.options = []
 
     this.div = document.createElement("div")
@@ -410,6 +411,7 @@ class PullDownMenu {
 
   onChange(event) {
     this.value = event.target.value
+    this.index = event.target.selectedIndex
     this.onChangeFunc(this.value)
   }
 
@@ -427,6 +429,7 @@ class PullDownMenu {
     option.value = label
     if (this.options.length <= 0) {
       this.value = label
+      this.index = 0
     }
     this.options.push(option)
     this.select.appendChild(option)
