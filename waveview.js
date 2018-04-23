@@ -9,10 +9,15 @@ class WaveView extends Canvas {
     this.wave = null
     this.autoScale = autoScale
     this.isUpperHalf = false
-    this.lastMousePosition = new Vec2(0, 0)
+    this.isMouseDown = false
+    this.lastX = 0
 
     this.set(wave)
     this.element.addEventListener("wheel", this, false)
+    this.element.addEventListener("mousedown", this, false)
+    this.element.addEventListener("mouseup", this, false)
+    this.element.addEventListener("mousemove", this, false)
+    this.element.addEventListener("mouseleave", this, false)
   }
 
   set(wave) {
@@ -52,7 +57,53 @@ class WaveView extends Canvas {
       case "wheel":
         this.onWheel(event)
         break
+      case "mousedown":
+        this.onMouseDown(event)
+        break
+      case "mouseup":
+        this.onMouseUp(event)
+        break
+      case "mousemove":
+        this.onMouseMove(event)
+        break
+      case "mouseleave":
+        this.onMouseLeave(event)
+        break
     }
+  }
+
+  onMouseDown(event) {
+    this.isMouseDown = true
+    var rect = event.target.getBoundingClientRect()
+    this.lastX = Math.floor(event.clientX - rect.left)
+  }
+
+  onMouseUp(event) {
+    this.isMouseDown = false
+  }
+
+  onMouseMove(event) {
+    if (!this.isMouseDown) return
+
+    var rect = event.target.getBoundingClientRect()
+    var x = Math.floor(event.clientX - rect.left)
+
+    var scroll = this.length * (x - this.lastX) / this.width
+    this.offset -= (scroll > 0) ? Math.ceil(scroll) : Math.floor(scroll)
+    if (this.offset < 0) {
+      this.offset = 0
+    }
+    else if (this.offset + this.length > this.wave.length) {
+      this.offset = this.wave.length - this.length
+    }
+    this.draw()
+
+    this.lastX = x
+  }
+
+  onMouseLeave(event) {
+    // マウスがcanvasの外に出たらスクロールしない。
+    this.isMouseDown = false
   }
 
   onWheel(event) {

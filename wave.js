@@ -127,6 +127,23 @@ class Wave {
         this.data[channel][last - sample] *= gain
         gain *= coefficient
       }
+
+      length = Math.min(32, this.data[channel].length)
+      for (var sample = 0; sample < length; ++sample) {
+        this.data[channel][last - sample]
+          *= 0.5 - Math.cos(Math.PI * sample / length) / 2
+      }
+    }
+  }
+
+  zeroOut(fadeLength) {
+    for (var channel = 0; channel < this.data.length; ++channel) {
+      var length = Math.min(fadeLength, this.data[channel].length)
+      var last = this.data[channel].length - 1
+      for (var sample = 0; sample < length; ++sample) {
+        this.data[channel][last - sample]
+          *= 0.5 - Math.cos(Math.PI * sample / length) / 2
+      }
     }
   }
 
@@ -154,6 +171,14 @@ class Wave {
     // console.log(start, end)
     for (var channel = 0; channel < this.data.length; ++channel) {
       this.data[channel] = this.data[channel].slice(start, end + 1)
+    }
+  }
+
+  copyChannel(channel) {
+    for (var ch = 0; ch < this.channels; ++ch) {
+      if (channel !== ch) {
+        this.data[ch] = Array.from(this.data[channel])
+      }
     }
   }
 
