@@ -182,6 +182,18 @@ class Wave {
     }
   }
 
+  rotate(channel, amount) {
+    var data = this.data[channel]
+    if (amount > 0) {
+      var temp = data.splice(amount, data.length - amount)
+      this.data[channel] = temp.concat(data)
+    }
+    else if (amount < 0) {
+      var temp = data.splice(0, Math.abs(amount))
+      this.data[channel] = data.concat(temp)
+    }
+  }
+
   static fileHeader(sampleRate, channels, bufferLength) {
     var format = this.fileFormat(sampleRate, 32, channels)
 

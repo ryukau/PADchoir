@@ -61,9 +61,21 @@ function save(wave) {
   }, 100)
 }
 
+function getChannels() {
+  switch (pullDownMenuChannel.value) {
+    case "Phase":
+    case "Mono":
+      return 1
+    case "Stereo":
+      return 2
+  }
+  return wave.channels
+}
+
 function makeWave() {
   headingRenderStatus.element.textContent = "⚠ Rendering ⚠"
-  for (var ch = 0; ch < wave.channels; ++ch) {
+  var channels = getChannels()
+  for (var ch = 0; ch < channels; ++ch) {
     if (workers[ch].isRunning) {
       workers[ch].worker.terminate()
       workers[ch].worker = new Worker("renderer.js")
@@ -99,19 +111,30 @@ function makeWave() {
       wave.data[index] = event.data
       workers[index].isRunning = false
       if (workers.every((v) => !v.isRunning)) {
-        if (checkboxNormalize.value) {
-          wave.normalize()
+        if (channels === 1) {
+          wave.copyChannel(index)
+          if (pullDownMenuChannel.value === "Phase" && wave.channels > 1) {
+            wave.rotate(1, Math.floor(wave.data[1].length / 2))
+          }
         }
-        waveView.set(wave)
-
-        if (checkboxQuickSave.value) {
-          save(wave)
-        }
-
-        headingRenderStatus.element.textContent = "Rendering finished. ✓"
+        finalize()
       }
     }
   })
+}
+
+function finalize() {
+  if (checkboxNormalize.value) {
+    wave.normalize()
+  }
+  wave.zeroOut(Math.floor(0.002 * audioContext.sampleRate))
+  waveView.set(wave)
+
+  if (checkboxQuickSave.value) {
+    save(wave)
+  }
+
+  headingRenderStatus.element.textContent = "Rendering finished. ✓"
 }
 
 class WaveViewMulti {
@@ -198,7 +221,7 @@ var workers = []
 for (var ch = 0; ch < wave.channels; ++ch) {
   workers.push({
     worker: new Worker("renderer.js"),
-    isRunning: true,
+    isRunning: false,
   })
 }
 
@@ -238,10 +261,11 @@ var divMiscControls = new Div(divControlLeft.element, "MiscControls")
 var headingRender = new Heading(divMiscControls.element, 6, "Render Settings")
 var inputLength = new NumberInput(divMiscControls.element, "Length",
   0.8, 0.02, 4, 0.01, refresh)
-// var pullDownMenuChannel = new PullDownMenu(divRenderControls.element, null,
-//   () => { })
-// pullDownMenuChannel.add("Mono")
-// pullDownMenuChannel.add("Stereo")
+var pullDownMenuChannel = new PullDownMenu(divMiscControls.element, null,
+  () => { refresh() })
+pullDownMenuChannel.add("Phase")
+pullDownMenuChannel.add("Mono")
+pullDownMenuChannel.add("Stereo")
 var checkboxNormalize = new Checkbox(divMiscControls.element, "Normalize",
   true, refresh)
 
