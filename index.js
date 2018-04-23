@@ -357,7 +357,7 @@ pullDownMenuAdaptHarmo.add("On")
 pullDownMenuAdaptHarmo.setValue("On", false)
 
 var inputAdaptBaseFreq = new NumberInput(divWaveTableControls.element, "Adapt.Freq",
-  124 / 128, 0, 1.0, 0.0001, refresh)
+  124 / 128, 0, 2, 0.0001, refresh)
 var inputAdaptPower = new NumberInput(divWaveTableControls.element, "Adapt.Power",
   78 / 127, 0, 1.0, 0.0001, refresh)
 
