@@ -199,10 +199,10 @@ function random() {
     inputModP1.random()
     inputModP2.random()
     inputModP3.random()
-    pullDownMenuFiltType.random()
+    pullDownMenuFiltType.setValue("None")
     inputFiltCutoff.random()
     inputFiltQ.random()
-    inputHarmonicShift.random()
+    inputHarmonicShift.value = 0
     pullDownMenuAdaptHarmo.random()
     inputAdaptBaseFreq.random()
     inputAdaptPower.random()
