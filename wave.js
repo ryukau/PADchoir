@@ -240,10 +240,47 @@ class Wave {
     var data = this.stringToAscii("data") // 4 + bufferLength [byte]
     var dataChunkSize = this.uint32buffer(bufferLength)
 
-    return this.concatTypedArray(riff, riffChunkSize, wave, fmt_,
-      fmtChunkSize, formatTag, channels, samplePerSec, bytesPerSec,
-      blockAlign, bitsPerSample, cbSize, fact, factChunkSize, sampleLength,
-      data, dataChunkSize)
+    return this.concatTypedArray(
+      riff,
+      riffChunkSize,
+
+      wave,
+
+      fmt_,
+      fmtChunkSize,
+      formatTag,
+      channels,
+      samplePerSec,
+      bytesPerSec,
+      blockAlign,
+      bitsPerSample,
+      cbSize,
+
+      fact,
+      factChunkSize,
+      sampleLength,
+
+      smpl,
+      smplChunkSize,
+      manufacturer,
+      product,
+      samplePeriod,
+      midiUnityNote,
+      midiPitchFraction,
+      smpteFormat,
+      smpteOffset,
+      numSampleLoops,
+      samplerData,
+      cuePointID,
+      type,
+      start,
+      end,
+      fraction,
+      playCount,
+
+      data,
+      dataChunkSize
+    )
   }
 
   static uint16buffer(value) {
