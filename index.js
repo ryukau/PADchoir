@@ -1,25 +1,5 @@
 const TWO_PI = 2 * Math.PI
 
-class RenderParameters {
-  constructor(audioContext, overSampling) {
-    this.audioContext = audioContext
-    this.overSampling = overSampling
-  }
-
-  get sampleRate() {
-    return this._sampleRate
-  }
-
-  get overSampling() {
-    return this._overSampling
-  }
-
-  set overSampling(value) {
-    this._overSampling = value
-    this._sampleRate = this._overSampling * this.audioContext.sampleRate
-  }
-}
-
 function play(audioContext, wave, stop = false) {
   if (stop) {
     this.source.stop()
@@ -90,6 +70,7 @@ function makeWave() {
     }
     workers[ch].worker.postMessage({
       sampleRate: audioContext.sampleRate,
+      overSampling: checkboxResample.value ? 16 : 1,
       baseFreq: inputBaseFreq.value,
       bandWidth: inputBandWidth.value,
       seed: inputSeed.value + inputSeed.max * ch,
@@ -214,7 +195,6 @@ function random() {
 //-- UI.
 
 var audioContext = new AudioContext()
-var renderParameters = new RenderParameters(audioContext, 16)
 
 var wave = new Wave(2)
 var workers = []
@@ -272,6 +252,8 @@ pullDownMenuChannel.add("Mono")
 pullDownMenuChannel.add("Stereo")
 var checkboxNormalize = new Checkbox(divMiscControls.element, "Normalize",
   true, refresh)
+var checkboxResample = new Checkbox(divMiscControls.element, "16x Sampling",
+  false, refresh)
 
 var divPadsynthControls = new Div(divControlLeft.element, "PadsynthControls")
 var headingPadsynth = new Heading(divPadsynthControls.element, 6, "PADsynth")

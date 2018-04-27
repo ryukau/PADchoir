@@ -242,12 +242,12 @@ class Checkbox {
 
     this.label = document.createElement("label")
     this.label.className = "checkboxLabel"
-    this.label.addEventListener("change", (event) => this.onChange(event), false)
     this.label.innerHTML = label
     this.label.setAttribute("for", label)
 
     this.input = document.createElement("input")
     this.input.type = "checkbox"
+    this.input.addEventListener("change", (event) => this.onChange(event), false)
     this.input.id = label
     if (checked) {
       this.input.setAttribute("checked", checked)

@@ -3,7 +3,8 @@ importScripts(
   "lib/fft.js",
   "lib/mersenne-twister.js",
   "envelope.js",
-  "oscilgen.js"
+  "oscilgen.js",
+  "resampler.js",
 )
 
 function profile(fi, bwi) {
@@ -39,9 +40,9 @@ function normalize(wave) {
 //
 // frequencies = [{freq: f, gain: g}, {freq: f, gain: g}, ...]
 //
-function padsynth(sampleRate, frequencies, bandWidth, rnd) {
+function padsynth(sampleRate, frequencies, bandWidth, rnd, overSampling) {
   var TWO_PI = 2 * Math.PI
-  var size = Math.pow(2, 18)
+  var size = Math.pow(2, 18 + Math.log2(overSampling))
   var fft = new FFT(size)
   var table = fft.createComplexArray()
   for (let elem of frequencies) {
@@ -115,7 +116,7 @@ function makeAdditiveChoirFrequencies(params, rnd) {
   return frequencies
 }
 
-function makeFrequencyShiftChoirFrequencies(params, rnd) {
+function makeFrequencyShiftChoirFrequencies(sampleRate, params, rnd) {
   var spec = render(
     params.baseFreq,
     params.basefunc,
@@ -136,7 +137,7 @@ function makeFrequencyShiftChoirFrequencies(params, rnd) {
   var frequencies = []
   for (var i = 1; i < spec.real.length; ++i) {
     var frq = params.baseFreq * i
-    if (frq > params.sampleRate / 2) break
+    if (frq > sampleRate / 2) break
     frequencies.push({
       freq: frq,
       gain: Math.sqrt(spec.real[i] * spec.real[i] + spec.imag[i] * spec.imag[i])
@@ -147,17 +148,19 @@ function makeFrequencyShiftChoirFrequencies(params, rnd) {
 
 onmessage = (event) => {
   var params = event.data
+  var sampleRate = params.sampleRate * params.overSampling
   var rnd = new MersenneTwister(params.seed)
 
-  var frequencies = makeFrequencyShiftChoirFrequencies(params, rnd)
+  var frequencies = makeFrequencyShiftChoirFrequencies(sampleRate, params, rnd)
   // var frequencies = makeAdditiveChoirFrequencies(params, rnd)
 
   var sound = padsynth(
-    params.sampleRate,
-    frequencies,
-    params.bandWidth,
-    rnd
-  )
+    sampleRate, frequencies, params.bandWidth, rnd, params.overSampling)
+
+  // down sampling.
+  if (params.overSampling > 1) {
+    sound = Resampler.pass(sound, sampleRate, params.sampleRate)
+  }
 
   postMessage(sound)
 }
