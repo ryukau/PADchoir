@@ -194,13 +194,18 @@ class Wave {
     }
   }
 
+  // Quick references.
+  // http://www.piclist.com/techref/io/serial/midi/wave.html
+  // https://sites.google.com/site/musicgapi/technical-documents/wav-file-format
   static fileHeader(sampleRate, channels, bufferLength) {
     var format = this.fileFormat(sampleRate, 32, channels)
 
     var riff = this.stringToAscii("RIFF")
-    var riffChunkSize = this.uint32buffer(50 + bufferLength)
+    var riffChunkSize = this.uint32buffer(110 + bufferLength)
+
     var wave = this.stringToAscii("WAVE")
-    var fmt_ = this.stringToAscii("fmt ")
+
+    var fmt_ = this.stringToAscii("fmt ") // 18 + 8 = 26 [byte]
     var fmtChunkSize = this.uint32buffer(18)
     var formatTag = this.uint16buffer(0x0003) // IEEE 32bit float
     var channels = this.uint16buffer(format.channels)
@@ -209,38 +214,36 @@ class Wave {
     var blockAlign = this.uint16buffer(format.bytesPerFrame)
     var bitsPerSample = this.uint16buffer(format.sampleSize)
     var cbSize = this.uint16buffer(0x0000)
-    var fact = this.stringToAscii("fact")
+
+    var fact = this.stringToAscii("fact") // 4 + 8 = 12 [byte]
     var factChunkSize = this.uint32buffer(4)
     var sampleLength = this.uint32buffer(bufferLength / format.bytesPerFrame)
-    var data = this.stringToAscii("data")
+
+    var smpl = this.stringToAscii("smpl") // 60 + 8 = 68 [byte]
+    var smplChunkSize = this.uint32buffer(60) // 36 + 24 * numLoop
+    var manufacturer = this.uint32buffer(0)
+    var product = this.uint32buffer(0)
+    var samplePeriod = this.uint32buffer(1e9 / format.sampleRate)
+    var midiUnityNote = this.uint32buffer(60) // 72?
+    var midiPitchFraction = this.uint32buffer(0)
+    var smpteFormat = this.uint32buffer(0)
+    var smpteOffset = this.uint32buffer(0)
+    var numSampleLoops = this.uint32buffer(1)
+    var samplerData = this.uint32buffer(24)
+    var cuePointID = this.uint32buffer(0)
+    var type = this.uint32buffer(0)
+    var start = this.uint32buffer(0)
+    var end = this.uint32buffer(bufferLength - format.bytesPerFrame) // 要テスト
+    var fraction = this.uint32buffer(0)
+    var playCount = this.uint32buffer(0)
+
+    var data = this.stringToAscii("data") // 4 + bufferLength [byte]
     var dataChunkSize = this.uint32buffer(bufferLength)
 
     return this.concatTypedArray(riff, riffChunkSize, wave, fmt_,
       fmtChunkSize, formatTag, channels, samplePerSec, bytesPerSec,
       blockAlign, bitsPerSample, cbSize, fact, factChunkSize, sampleLength,
       data, dataChunkSize)
-  }
-
-  // Wave ファイルの出力。Node.js 上でのみ動作。
-  // 2チャンネルのデータまで対応。
-  // フォーマットは IEEE 32bit float で固定。
-  // http://www-mmsp.ece.mcgill.ca/documents/audioformats/wave/wave.html
-  static write(filename, wave, sampleRate) {
-    if (wave.data.length <= 0 || wave.data.length > 2) {
-      console.log("WaveFile Write failed: wave.data.length <= 0 || wave.data.length > 2.")
-    }
-
-    var format = this.fileFormat(sampleRate, 32, wave.channels)
-    var buffer = this.toBuffer(wave, format.channels)
-    var header = wave.fileHeader(format.sampleRate, wave.channels,
-      buffer.length)
-
-    var fs = require("fs")
-    var wstream = fs.createWriteStream(filename)
-    wstream.write(Buffer.from(header))
-    // いったん Uint8Array に直さないと Buffer.from() はうまく動かない。
-    wstream.write(Buffer.from(buffer))
-    wstream.end()
   }
 
   static uint16buffer(value) {
