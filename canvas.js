@@ -99,13 +99,11 @@ class Canvas {
   clearWhite() {
     this.context.fillStyle = "#ffffff"
     this.context.fillRect(0, 0, this.element.width, this.element.height)
-    this.context.fill()
   }
 
   clear(color) {
     this.context.fillStyle = color
     this.context.fillRect(0, 0, this.element.width, this.element.height)
-    this.context.fill()
   }
 
   resetTransform() {

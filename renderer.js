@@ -117,7 +117,8 @@ function makeAdditiveChoirFrequencies(params, rnd) {
 }
 
 function makeFrequencyShiftChoirFrequencies(sampleRate, params, rnd) {
-  var spec = render(
+  // oscilgen.js
+  var spec = renderWaveTable(
     params.baseFreq,
     params.basefunc,
     params.basefuncP1,
@@ -131,7 +132,8 @@ function makeFrequencyShiftChoirFrequencies(sampleRate, params, rnd) {
     params.harmonicShift,
     params.adaptiveHarmonics,
     params.adaptBaseFreq,
-    params.adaptPower
+    params.adaptPower,
+    params.overtone
   )
 
   var frequencies = []

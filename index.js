@@ -87,6 +87,7 @@ function makeWave() {
       adaptiveHarmonics: pullDownMenuAdaptHarmo.index === 1,
       adaptBaseFreq: inputAdaptBaseFreq.value,
       adaptPower: inputAdaptPower.value,
+      overtone: overtoneControl.overtone,
     })
   }
 
@@ -136,6 +137,170 @@ class WaveViewMulti {
   }
 }
 
+class OvertoneControl extends Canvas {
+  constructor(parent, width, height, numOvertone, onChangeFunc) {
+    super(parent, width, height)
+
+    this.element.className = "overtoneControl"
+    this.onChangeFunc = onChangeFunc
+
+    numOvertone = Math.floor(Math.max(1, numOvertone))
+    this.overtone = new Array(numOvertone).fill(0)
+    this.overtone[0] = 1
+
+    this.sliderWidth = width / numOvertone
+
+    this.isMouseDown = false
+
+    this.element.addEventListener("wheel", this, false)
+    this.element.addEventListener("mousedown", this, false)
+    this.element.addEventListener("mouseup", this, false)
+    this.element.addEventListener("mousemove", this, false)
+    this.element.addEventListener("mouseleave", this, false)
+
+    this.draw()
+  }
+
+  setOvertone(overtone) {
+    if (overtone.length !== this.overtone.length) {
+      console.log("Overtone length mismatch")
+      console.trace()
+      return
+    }
+
+    var min = Number.MAX_VALUE
+    var max = Number.MIN_VALUE
+    for (var i = 0; i < overtone.length; ++i) {
+      if (overtone[i] < min)
+        min = overtone[i]
+      else if (overtone[i] > max)
+        max = overtone[i]
+    }
+
+    var diff = max - min
+    for (var i = 0; i < this.overtone.length; ++i) {
+      this.overtone[i] = (overtone[i] - min) / diff
+    }
+
+    this.draw()
+  }
+
+  handleEvent(event) {
+    switch (event.type) {
+      case "wheel":
+        this.onWheel(event)
+        break
+      case "mousedown":
+        this.onMouseDown(event)
+        break
+      case "mouseup":
+        this.onMouseUp(event)
+        break
+      case "mousemove":
+        this.onMouseMove(event)
+        break
+      case "mouseleave":
+        this.onMouseLeave(event)
+        break
+    }
+  }
+
+  getMousePosition(event) {
+    var rect = event.target.getBoundingClientRect()
+    var x = Math.floor(event.clientX - rect.left)
+    var y
+    if (event.buttons !== 1)
+      y = this.height
+    else {
+      if (event.ctrlKey)
+        y = this.height
+      else if (event.altKey)
+        y = 0
+      else
+        y = Math.floor(event.clientY - rect.top)
+    }
+    return new Vec2(x, y)
+  }
+
+  onMouseDown(event) {
+    this.isMouseDown = true
+
+    this.setValueFromPosition(this.getMousePosition(event))
+  }
+
+  onMouseUp(event) {
+    this.isMouseDown = false
+    this.onChangeFunc()
+  }
+
+  onMouseMove(event) {
+    if (!this.isMouseDown)
+      return
+
+    this.setValueFromPosition(this.getMousePosition(event))
+  }
+
+  onMouseLeave(event) {
+    if (this.isMouseDown === true)
+      this.onChangeFunc()
+
+    this.isMouseDown = false
+  }
+
+  onWheel(event) {
+    event.preventDefault() // 画面のスクロールを阻止。
+
+    var rect = event.target.getBoundingClientRect()
+    var x = Math.floor(event.clientX - rect.left)
+    var index = Math.floor(x / this.sliderWidth)
+
+    if (event.ctrlKey) {
+      this.setValue(index, this.overtone[index] - 0.001 * event.deltaY)
+    }
+    else {
+      this.setValue(index, this.overtone[index] - 0.003 * event.deltaY)
+    }
+
+    this.draw()
+    this.onChangeFunc()
+  }
+
+  setValue(index, value) {
+    this.overtone[index] = Math.max(0, Math.min(value, 1))
+  }
+
+  setValueFromPosition(position) {
+    var index = Math.floor(position.x / this.sliderWidth)
+    var value = 1 - position.y / this.height
+
+    this.setValue(index, value)
+    this.draw()
+  }
+
+  draw() {
+    this.clearWhite()
+
+    var ctx = this.context
+
+    ctx.fillStyle = "#88bbff"
+    ctx.strokeStyle = "#333333"
+    ctx.lineWidth = 2
+
+    ctx.beginPath()
+    for (var i = 0; i < this.overtone.length; ++i) {
+      var sliderHeight = this.overtone[i] * this.height
+      ctx.rect(
+        i * this.sliderWidth,
+        this.height - sliderHeight,
+        this.sliderWidth,
+        sliderHeight
+      )
+    }
+    ctx.fill()
+    ctx.stroke()
+  }
+}
+
 function refresh() {
   makeWave()
 }
@@ -159,6 +324,12 @@ function random() {
     inputHarmonicShift.value = randomRangeInt(7, 15)
     inputAdaptBaseFreq.value = randomRange(0.7, 1.2)
     inputAdaptPower.value = randomRange(0.3, 1)
+
+    var overtone = new Array(overtoneControl.overtone.length)
+    for (var i = 0; i < overtone.length; ++i) {
+      overtone[i] = Math.random()
+    }
+    overtoneControl.setOvertone(overtone)
   }
   else if (pullDownMenuRandomType.value === "PADsynth") {
     inputBaseFreq.random()
@@ -187,6 +358,12 @@ function random() {
     pullDownMenuAdaptHarmo.random()
     inputAdaptBaseFreq.random()
     inputAdaptPower.random()
+
+    var overtone = new Array(overtoneControl.overtone.length)
+    for (var i = 0; i < overtone.length; ++i) {
+      overtone[i] = Math.random()
+    }
+    overtoneControl.setOvertone(overtone)
   }
   refresh()
 }
@@ -245,7 +422,7 @@ var divControlLeft = new Div(divMain.element, "controlLeft", "controlBlock")
 
 var divMiscControls = new Div(divControlLeft.element, "MiscControls")
 var headingRender = new Heading(divMiscControls.element, 6, "Render Settings")
-var pullDownMenuChannel = new PullDownMenu(divMiscControls.element, "",
+var pullDownMenuChannel = new PullDownMenu(divMiscControls.element, null,
   () => { refresh() })
 pullDownMenuChannel.add("Phase")
 pullDownMenuChannel.add("Mono")
@@ -263,6 +440,11 @@ var inputBandWidth = new NumberInput(divPadsynthControls.element, "BandWidth",
   50, 0.01, 200, 0.01, refresh)
 var inputSeed = new NumberInput(divPadsynthControls.element, "Seed",
   0, 0, Math.floor(Number.MAX_SAFE_INTEGER / 2), 1, refresh)
+
+var divOvertoneControl = new Div(divControlLeft.element, "OvertoneControl")
+var headingOvertone = new Heading(divOvertoneControl.element, 6, "Overtone")
+var overtoneControl = new OvertoneControl(divOvertoneControl.element,
+  384, 128, 32, refresh)
 
 //// ControlRight
 var divControlRight = new Div(divMain.element, "controlLeft", "controlBlock")

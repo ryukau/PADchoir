@@ -589,7 +589,7 @@ function toSignal(spectrum) {
 //
 // lp: low-pass, hp: high-pass, bp: band-pass, bs: band-stop
 //
-function render(
+function renderWaveTable(
   freqhz,
   oscType,
   oscP1,
@@ -603,12 +603,25 @@ function render(
   harmonicshift,
   adapt,
   adaptBaseFreq,
-  adaptPower
+  adaptPower,
+  overtone
 ) {
   var oscFunc = selectOscFunc(oscType)
-  var table = makeTimeTable(halfoscilsize, modulationType, modP1, modP2, modP3)
+  var timeTable = makeTimeTable(halfoscilsize, modulationType, modP1, modP2, modP3)
+  var table = new Array(timeTable.length).fill(0)
+
+  for (var i = 0; i < overtone.length; ++i) {
+    if (overtone[i] === 0) continue
+    var step = i + 1
+    var phase = 0
+    for (var j = 0; j < table.length; ++j) {
+      phase += step
+      table[j] += overtone[i] * oscFunc(timeTable[phase % table.length], oscP1)
+    }
+  }
+
   for (var i = 0; i < table.length; ++i) {
-    table[i] = oscFunc(table[i], oscP1)
+    table[i] /= overtone.length
   }
 
   var spec = toSpectrum(table)
@@ -619,7 +632,7 @@ function render(
 }
 
 // Yoshimi のパラメータを直接入力するときに使う。
-function renderFixedParams(
+function renderWaveTableYoshimiParams(
   freqhz,
   oscType,
   oscP1,
