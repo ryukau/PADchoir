@@ -16,8 +16,9 @@
 		h6 {
 			text-align: center;
 			margin: 16px 0 8px 0;
-			font-size: 12px;
-			font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+
+			background-color: #e4e7e8;
+			border-left: #627f84 solid 4px;
 		}
 
 		#main {
@@ -77,29 +78,16 @@
 
 		.controlBlock {
 			display: inline-block;
-			min-width: 450px;
+			width: 450px;
 			text-align: left;
 			vertical-align: top;
-		}
-
-		select {
-			background-color: #ffffff;
-			border: 2px solid #aaaaaa;
-			height: 24px;
-			margin-bottom: 4px;
-			font-size: 16px;
-		}
-
-		select:hover {
-			background-color: #ffffff;
-			border: 2px solid #aaccff;
 		}
 
 		input[type="button"] {
 			background-color: #ffffff;
 			border: 2px solid #aaaaaa;
-			height: 32px;
 			font-size: 16px;
+			height: 32px;
 		}
 
 		input[type="button"]:hover {
@@ -114,77 +102,77 @@
 			text-align: left;
 		}
 
-		.numberInput {
-			margin: 4px 0 4px 0;
-			height: 24px;
+		div.numberInput {
+			display: block;
+			white-space: nowrap;
+		}
+
+		div.numberInput:hover {
+			background-color: #e0ecff;
 		}
 
 		.numberInputLabel {
+			/* max 12 letter  */
 			display: inline-block;
-			text-align: right;
-			width: 110px;
-			margin: 0 8px 0 0;
-		}
+			margin: 0 8px 0 8px;
+			text-align: left;
+			width: 100px;
 
-		.numberInputRange {
-			display: inline-block;
-			max-width: 280px;
-			width: 48%;
-			margin: 0 8px 0 0;
-		}
-
-		.numberInputRange:hover {
-			background-color: #aaccff;
+			font-size: 10pt;
+			font-family: 'Courier New', Courier, monospace;
 		}
 
 		.numberInputNumber {
 			display: inline-block;
-			width: 22%;
-			margin: 0;
+			width: 120px;
 		}
 
-		.numberInputNumber:hover {
-			background-color: #ffffff;
-			border: 2px solid #aaccff;
+		.numberInputRange {
+			display: inline-block;
+			width: 160px;
 		}
 
 		.pullDownMenu {
 			display: inline-block;
+			text-align: center;
 		}
 
-		.radioButton {
-			display: inline-block;
-			max-width: 960px;
-			min-width: 450px;
+		.pullDownMenu:hover {
+			background-color: #e0ecff;
 		}
 
-		.radioButtonLabel {
-			display: inline-block;
-			text-align: right;
-			width: 110px;
-			margin-right: 10px;
+		select {
+			background-color: #ffffff;
+			border: 2px solid #aaaaaa;
+			height: 20px;
+			margin-top: 2px;
+			margin-bottom: 4px;
+			font-size: 12px;
 		}
 
-		.radioButtonControls {
-			display: inline-block;
+		select:hover {
+			background-color: #ffffff;
+			border: 2px solid #aaccff;
 		}
 
 		.checkbox {
 			display: inline-block;
+			margin: 8px;
+			text-align: center;
+
+			font-size: 10pt;
+			font-family: 'Courier New', Courier, monospace;
 		}
 
-		.checkbox:hover {
-			background-color: #aaccff;
-		}
-
-		.checkbox input {
-			margin: 0 4px 0 10px;
+		input[type='checkbox'] {
+			border-style: solid;
+			border-width: 2px;
+			border-color: #000000;
 		}
 
 		#miscControls .checkbox {
 			margin: 4px;
 			text-align: center;
-			width: 100%;
 		}
 
 		/* chordControls */
