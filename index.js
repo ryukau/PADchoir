@@ -157,6 +157,9 @@ class OvertoneControl extends Canvas {
     this.element.addEventListener("mouseup", this, false)
     this.element.addEventListener("mousemove", this, false)
     this.element.addEventListener("mouseleave", this, false)
+    this.element.addEventListener("touchstart", this, false)
+    this.element.addEventListener("touchend", this, false)
+    this.element.addEventListener("touchmove", this, false)
 
     this.draw()
   }
@@ -202,23 +205,25 @@ class OvertoneControl extends Canvas {
       case "mouseleave":
         this.onMouseLeave(event)
         break
+      case "touchstart":
+        this.onMouseDown(event)
+        break
+      case "touchend":
+        this.onMouseUp(event)
+        break
+      case "touchmove":
+        this.onMouseMove(event)
+        break
     }
   }
 
   getMousePosition(event) {
+    var point = event.type.includes("touch") ? event.touches[0] : event
+
     var rect = event.target.getBoundingClientRect()
-    var x = Math.floor(event.clientX - rect.left)
-    var y
-    if (event.buttons !== 1)
-      y = this.height
-    else {
-      if (event.ctrlKey)
-        y = this.height
-      else if (event.altKey)
-        y = 0
-      else
-        y = Math.floor(event.clientY - rect.top)
-    }
+    var x = Math.floor(point.clientX - rect.left)
+    var y = event.ctrlKey ? this.height
+      : event.altKey ? 0 : Math.floor(point.clientY - rect.top)
     return new Vec2(x, y)
   }
 
@@ -234,6 +239,7 @@ class OvertoneControl extends Canvas {
   }
 
   onMouseMove(event) {
+    console.log(event)
     if (!this.isMouseDown)
       return
 
