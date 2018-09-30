@@ -406,6 +406,8 @@ var waveView = new WaveViewMulti(divWaveform.element, wave.channels)
 var divRenderControls = new Div(divMain.element, "renderControls")
 var headingRenderStatus = new Heading(divRenderControls.element, 4,
   "Rendering status will be displayed here.")
+var buttonStop = new Button(divRenderControls.element, "Stop",
+  () => play(audioContext, wave, true))
 var buttonPlay = new Button(divRenderControls.element, "Play",
   () => play(audioContext, wave))
 var buttonRandom = new Button(divRenderControls.element, "Random",
@@ -416,8 +418,6 @@ pullDownMenuRandomType.add("Choir")
 pullDownMenuRandomType.add("PADsynth")
 pullDownMenuRandomType.add("Seed")
 pullDownMenuRandomType.add("All")
-var buttonStop = new Button(divRenderControls.element, "Stop",
-  () => play(audioContext, wave, true))
 var buttonSave = new Button(divRenderControls.element, "Save",
   () => save(wave))
 var checkboxQuickSave = new Checkbox(divRenderControls.element, "QuickSave",
