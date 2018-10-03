@@ -358,7 +358,7 @@ function random() {
     }
     overtoneControl.setOvertone(overtone)
   }
-  else if (pullDownMenuRandomType.value === "ihh") {
+  else if (pullDownMenuRandomType.value === "i") {
     inputSeed.random()
 
     pullDownMenuBaseFunction.setValue("Sqr", false)
@@ -470,7 +470,7 @@ var buttonRandom = new Button(divRenderControls.element, "Random",
 var pullDownMenuRandomType = new PullDownMenu(divRenderControls.element, null,
   () => { })
 pullDownMenuRandomType.add("Choir")
-pullDownMenuRandomType.add("ihh")
+pullDownMenuRandomType.add("i")
 pullDownMenuRandomType.add("PADsynth")
 pullDownMenuRandomType.add("Seed")
 pullDownMenuRandomType.add("All")
