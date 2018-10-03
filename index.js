@@ -313,7 +313,7 @@ class OvertoneControl extends Canvas {
     ctx.fillStyle = "#000000"
     ctx.font = "8px monospace"
     for (var i = 0; i < this.overtone.length; ++i) {
-      ctx.fillText((i + 1), i * this.sliderWidth + 1, this.height - 4)
+      ctx.fillText((i + 1), i * this.sliderWidth + 2, this.height - 4)
     }
 
     if (this.mouseX !== null) {
@@ -340,6 +340,8 @@ function randomRangeInt(min, max) {
 
 function random() {
   if (pullDownMenuRandomType.value === "Choir") {
+    inputSeed.random()
+
     inputBaseFunctionP1.value = randomRange(0.18, 0.82)
     inputModP1.value = 0.28346456692913385
     inputModP2.value = 0.5354330708661418
@@ -354,6 +356,31 @@ function random() {
     for (var i = 0; i < overtone.length; ++i) {
       overtone[i] = Math.random()
     }
+    overtoneControl.setOvertone(overtone)
+  }
+  else if (pullDownMenuRandomType.value === "ihh") {
+    inputSeed.random()
+
+    pullDownMenuBaseFunction.setValue("Sqr")
+    inputBaseFunctionP1.value = randomRange(0.4, 0.5)
+    inputModP1.value = randomRange(0.18, 0.25)
+    inputModP2.value = randomRange(0.4, 0.5)
+    inputModP3.value = randomRange(0.32, 0.38)
+    pullDownMenuFiltType.setValue("BandStop1")
+    inputFiltCutoff.value = randomRange(0.52, 0.6)
+    inputFiltQ.value = randomRange(0.7, 0.9)
+    inputHarmonicShift.value = 0
+    inputAdaptBaseFreq.value = randomRange(0.27, 0.30)
+    inputAdaptPower.value = randomRange(0.8, 0.9)
+
+    var overtone = new Array(overtoneControl.overtone.length).fill(0)
+    overtone[1] = 0.6
+    overtone[26] = randomRange(0, 0.5)
+    overtone[27] = randomRange(0, 0.5)
+    overtone[28] = randomRange(0, 0.2)
+    overtone[29] = 0.5
+    overtone[30] = randomRange(0, 0.2)
+    overtone[31] = randomRange(0, 0.2)
     overtoneControl.setOvertone(overtone)
   }
   else if (pullDownMenuRandomType.value === "PADsynth") {
@@ -434,6 +461,7 @@ var buttonRandom = new Button(divRenderControls.element, "Random",
 var pullDownMenuRandomType = new PullDownMenu(divRenderControls.element, null,
   () => { })
 pullDownMenuRandomType.add("Choir")
+pullDownMenuRandomType.add("ihh")
 pullDownMenuRandomType.add("PADsynth")
 pullDownMenuRandomType.add("Seed")
 pullDownMenuRandomType.add("All")
