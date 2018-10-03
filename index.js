@@ -361,15 +361,16 @@ function random() {
   else if (pullDownMenuRandomType.value === "ihh") {
     inputSeed.random()
 
-    pullDownMenuBaseFunction.setValue("Sqr")
+    pullDownMenuBaseFunction.setValue("Sqr", false)
     inputBaseFunctionP1.value = randomRange(0.4, 0.5)
     inputModP1.value = randomRange(0.18, 0.25)
     inputModP2.value = randomRange(0.4, 0.5)
     inputModP3.value = randomRange(0.32, 0.38)
-    pullDownMenuFiltType.setValue("BandStop1")
+    pullDownMenuFiltType.setValue("BandStop1", false)
     inputFiltCutoff.value = randomRange(0.52, 0.6)
     inputFiltQ.value = randomRange(0.7, 0.9)
     inputHarmonicShift.value = randomRangeInt(0, 3)
+    pullDownMenuAdaptHarmo.setValue("On", false)
     inputAdaptBaseFreq.value = randomRange(0.27, 0.30)
     inputAdaptPower.value = randomRange(0.8, 0.9)
 
