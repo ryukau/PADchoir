@@ -369,12 +369,20 @@ function random() {
     pullDownMenuFiltType.setValue("BandStop1")
     inputFiltCutoff.value = randomRange(0.52, 0.6)
     inputFiltQ.value = randomRange(0.7, 0.9)
-    inputHarmonicShift.value = 0
+    inputHarmonicShift.value = randomRangeInt(0, 3)
     inputAdaptBaseFreq.value = randomRange(0.27, 0.30)
     inputAdaptPower.value = randomRange(0.8, 0.9)
 
     var overtone = new Array(overtoneControl.overtone.length).fill(0)
     overtone[1] = 0.6
+
+    overtone[20] = randomRange(0, 0.6)
+    overtone[21] = randomRange(0, 0.6)
+    overtone[22] = randomRange(0, 0.6)
+    overtone[23] = randomRange(0, 0.6)
+    overtone[24] = randomRange(0, 0.6)
+    overtone[25] = randomRange(0, 0.6)
+
     overtone[26] = randomRange(0, 0.5)
     overtone[27] = randomRange(0, 0.5)
     overtone[28] = randomRange(0, 0.2)
