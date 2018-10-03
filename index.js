@@ -151,6 +151,7 @@ class OvertoneControl extends Canvas {
     this.sliderWidth = width / numOvertone
 
     this.isMouseDown = false
+    this.mouseX = null
 
     this.element.addEventListener("wheel", this, false)
     this.element.addEventListener("mousedown", this, false)
@@ -239,11 +240,13 @@ class OvertoneControl extends Canvas {
   }
 
   onMouseMove(event) {
-    console.log(event)
-    if (!this.isMouseDown)
-      return
+    var pos = this.getMousePosition(event)
+    this.mouseX = pos.x
 
-    this.setValueFromPosition(this.getMousePosition(event))
+    if (this.isMouseDown)
+      this.setValueFromPosition(pos)
+    else
+      this.draw()
   }
 
   onMouseLeave(event) {
@@ -251,6 +254,8 @@ class OvertoneControl extends Canvas {
       this.onChangeFunc()
 
     this.isMouseDown = false
+    this.mouseX = null
+    this.draw()
   }
 
   onWheel(event) {
@@ -304,6 +309,20 @@ class OvertoneControl extends Canvas {
     }
     ctx.fill()
     ctx.stroke()
+
+    ctx.fillStyle = "#000000"
+    ctx.font = "8px monospace"
+    for (var i = 0; i < this.overtone.length; ++i) {
+      ctx.fillText((i + 1), i * this.sliderWidth + 1, this.height - 4)
+    }
+
+    if (this.mouseX !== null) {
+      var index = Math.floor(this.overtone.length * this.mouseX / this.width)
+      if (index >= 0 && index < this.overtone.length) {
+        ctx.fillStyle = "#00ff0033"
+        ctx.fillRect(index * this.sliderWidth, 0, this.sliderWidth, this.height)
+      }
+    }
   }
 }
 
@@ -450,7 +469,7 @@ var inputSeed = new NumberInput(divPadsynthControls.element, "Seed",
 var divOvertoneControl = new Div(divControlLeft.element, "OvertoneControl")
 var headingOvertone = new Heading(divOvertoneControl.element, 6, "Overtone")
 var overtoneControl = new OvertoneControl(divOvertoneControl.element,
-  384, 128, 32, refresh)
+  448, 128, 32, refresh)
 
 //// ControlRight
 var divControlRight = new Div(divMain.element, "controlLeft", "controlBlock")
