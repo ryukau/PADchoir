@@ -392,6 +392,23 @@ function random() {
     overtone[31] = randomRange(0, 0.2)
     overtoneControl.setOvertone(overtone)
   }
+  else if (pullDownMenuRandomType.value === "oa") {
+    inputSeed.random()
+
+    pullDownMenuBaseFunction.setValue("Pulsesine", false)
+    inputBaseFunctionP1.value = randomRange(0.7, 0.71)
+    inputModP1.value = randomRange(0.3, 0.4)
+    inputModP2.value = randomRange(0.1, 0.2)
+    inputModP3.value = randomRange(0.5, 0.6)
+    inputHarmonicShift.value = randomRangeInt(10, 25)
+    pullDownMenuAdaptHarmo.setValue("On", false)
+    inputAdaptBaseFreq.value = 0.275
+    inputAdaptPower.value = randomRange(0.4, 0.45)
+
+    var overtone = new Array(overtoneControl.overtone.length).fill(0)
+    overtone[randomRangeInt(3, 6)] = 1
+    overtoneControl.setOvertone(overtone)
+  }
   else if (pullDownMenuRandomType.value === "PADsynth") {
     inputBaseFreq.random()
     inputBandWidth.random()
@@ -471,6 +488,7 @@ var pullDownMenuRandomType = new PullDownMenu(divRenderControls.element, null,
   () => { })
 pullDownMenuRandomType.add("Choir")
 pullDownMenuRandomType.add("i")
+pullDownMenuRandomType.add("oa")
 pullDownMenuRandomType.add("PADsynth")
 pullDownMenuRandomType.add("Seed")
 pullDownMenuRandomType.add("All")
