@@ -363,6 +363,7 @@ function random() {
 
     pullDownMenuBaseFunction.setValue("Sqr", false)
     inputBaseFunctionP1.value = randomRange(0.4, 0.5)
+    pullDownMenuModType.setValue("Rev", false)
     inputModP1.value = randomRange(0.18, 0.25)
     inputModP2.value = randomRange(0.4, 0.5)
     inputModP3.value = randomRange(0.32, 0.38)
@@ -390,6 +391,43 @@ function random() {
     overtone[29] = 0.5
     overtone[30] = randomRange(0, 0.2)
     overtone[31] = randomRange(0, 0.2)
+    overtoneControl.setOvertone(overtone)
+  }
+  else if (pullDownMenuRandomType.value === "i saw bp") {
+    inputSeed.random()
+
+    pullDownMenuBaseFunction.setValue("Saw", false)
+    inputBaseFunctionP1.value = randomRange(0.5, 0.51)
+    pullDownMenuModType.setValue("Rev", false)
+    inputModP1.value = 0.19
+    inputModP2.value = randomRange(0.4, 0.5)
+    inputModP3.value = randomRange(0.62, 0.7)
+    pullDownMenuFiltType.setValue("BandPass2", false)
+    inputFiltCutoff.value = randomRange(0.7, 0.8)
+    inputFiltQ.value = randomRange(0.7, 0.8)
+    // inputHarmonicShift.value = 9
+    inputHarmonicShift.value = randomRangeInt(5, 9)
+    pullDownMenuAdaptHarmo.setValue("On", false)
+    inputAdaptBaseFreq.value = 0.286
+    inputAdaptPower.value = 0.755 //randomRange(0.7, 0.8)
+
+    var overtone = new Array(overtoneControl.overtone.length).fill(0)
+    overtone[1] = 0.2
+
+    overtone[4] = randomRange(0, 0.1)
+    overtone[5] = randomRange(0.15, 0.2)
+
+    // overtone[20] = randomRange(0, 0.6)
+    // overtone[21] = randomRange(0, 0.6)
+    // overtone[22] = randomRange(0, 0.6)
+    // overtone[23] = randomRange(0, 0.6)
+    // overtone[24] = randomRange(0, 0.6)
+    // overtone[25] = randomRange(0, 0.6)
+
+    overtone[27] = randomRange(0.15, 0.2)
+    overtone[28] = randomRange(0, 0.2)
+    overtone[29] = randomRange(0.15, 0.2)
+    overtone[30] = randomRange(0, 0.2)
     overtoneControl.setOvertone(overtone)
   }
   else if (pullDownMenuRandomType.value === "oa") {
@@ -488,6 +526,7 @@ var pullDownMenuRandomType = new PullDownMenu(divRenderControls.element, null,
   () => { })
 pullDownMenuRandomType.add("Choir")
 pullDownMenuRandomType.add("i")
+pullDownMenuRandomType.add("i saw bp")
 pullDownMenuRandomType.add("oa")
 pullDownMenuRandomType.add("PADsynth")
 pullDownMenuRandomType.add("Seed")
