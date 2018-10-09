@@ -508,6 +508,7 @@ description.add("", "値を変更するかRandomボタンを押すと音がレ�
 description.add("", "Randomボタンの隣のプルダウンメニューでランダマイズの種類を選択できます。")
 description.add("", "Saveボタンで気に入った音を保存できます。")
 description.add("", "QuickSaveにチェックを入れると音を再生するたびに音が保存されます。")
+description.add("", "Overtoneの値はCtrl+クリックで0、Alt+クリックで1に設定できます。")
 
 var divWaveform = new Div(divMain.element, "waveform")
 var headingWaveform = new Heading(divWaveform.element, 6, "Waveform")
