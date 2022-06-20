@@ -177,7 +177,7 @@ class OvertoneControl extends Canvas {
     for (var i = 0; i < overtone.length; ++i) {
       if (overtone[i] < min)
         min = overtone[i]
-      else if (overtone[i] > max)
+      if (overtone[i] > max)
         max = overtone[i]
     }
 
@@ -447,6 +447,32 @@ function random() {
     overtone[randomRangeInt(3, 6)] = 1
     overtoneControl.setOvertone(overtone)
   }
+  else if (pullDownMenuRandomType.value === "Additive Pad") {
+    inputSeed.random()
+    inputBandWidth.value = 1.0 + 199.0 * (randomRange(0.0, 1.0) ** 2)
+
+    pullDownMenuBaseFunction.setValue("Sine", false)
+    inputBaseFunctionP1.value = 0.0
+    pullDownMenuModType.setValue("None", false)
+    inputModP1.value = 0.0
+    inputModP2.value = 0.0
+    inputModP3.value = 0.0
+    pullDownMenuFiltType.setValue("LowPass1", false)
+    inputFiltCutoff.value = 1.0
+    inputFiltQ.value = randomRange(0.0, 1.0)
+    inputHarmonicShift.value = 0.0
+    pullDownMenuAdaptHarmo.setValue("Off", false)
+    inputAdaptBaseFreq.value = 0.0
+    inputAdaptPower.value = 0.0
+
+    var overtone = new Array(overtoneControl.overtone.length).fill(0)
+    overtone[0] = 1
+    for (var idx = 1; idx < overtone.length; ++idx) {
+      if (randomRange(0.0, 1.0) >= 0.15) continue
+      overtone[idx] = randomRange(0.5, 1.0) / (idx + 1)
+    }
+    overtoneControl.setOvertone(overtone)
+  }
   else if (pullDownMenuRandomType.value === "PADsynth") {
     inputBaseFreq.random()
     inputBandWidth.random()
@@ -530,6 +556,7 @@ pullDownMenuRandomType.add("i")
 pullDownMenuRandomType.add("i saw bp")
 pullDownMenuRandomType.add("oa")
 pullDownMenuRandomType.add("PADsynth")
+pullDownMenuRandomType.add("Additive Pad")
 pullDownMenuRandomType.add("Seed")
 pullDownMenuRandomType.add("All")
 var buttonSave = new Button(divRenderControls.element, "Save",
